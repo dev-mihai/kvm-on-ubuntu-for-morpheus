@@ -36,7 +36,7 @@ Before running the setup script, ensure you have updated the `settings.conf` fil
 - VM_USERNAME
 - VM_PASSWORD (hashed)
 
-### Storage Configuration
+### Other Configuration
 
 - VM_DIR
 
