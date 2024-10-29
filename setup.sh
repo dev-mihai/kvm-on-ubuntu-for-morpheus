@@ -68,7 +68,7 @@ if ! ./scripts/01-install-kvm.sh; then
 fi
 
 echo "2. Configuring Storage Pools..."
-if ! ./scripts/02-configure-pools.sh; then
+if ! ./scripts/02-other-config-changes.sh; then
     echo "Storage pool configuration failed!"
     exit 1
 fi

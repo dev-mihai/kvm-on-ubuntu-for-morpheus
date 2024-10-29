@@ -118,16 +118,13 @@ cat > user-data <<USERDATA
 #cloud-config
 hostname: $VM_NAME
 manage_etc_hosts: true
-
 # Install QEMU Guest Agent
 packages:
   - qemu-guest-agent
-
 # Enable and start QEMU Guest Agent
 runcmd:
   - [ systemctl, enable, qemu-guest-agent ]
   - [ systemctl, start, qemu-guest-agent ]
-
 users:
   - name: mihai
     sudo: ALL=(ALL) NOPASSWD:ALL
@@ -135,12 +132,10 @@ users:
     home: /home/mihai
     shell: /bin/bash
     lock_passwd: false
+    passwd: $6$ARMwsturdwoxQu44$vD2GP4tbqBcpvVo6uDebWZjFudxsMLU5aYl8z/v/NTsD1vrIuaCLIiObLmBQww4ipqOjwcfIGD.U4J1oORSTH.
 ssh_pwauth: true
 disable_root: false
-chpasswd:
-  list: |
-    mihai:mihai
-  expire: false
+
 USERDATA
 
     touch meta-data
