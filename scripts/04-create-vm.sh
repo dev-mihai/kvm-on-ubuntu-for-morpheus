@@ -100,7 +100,7 @@ network:
     ethernets:
         $INTERFACE:
             addresses:
-            - $VM_IP/22
+            - $VM_IP/$NETWORK_CIDR
             dhcp4: false
             routes:
             -   to: default
@@ -126,13 +126,13 @@ runcmd:
   - [ systemctl, enable, qemu-guest-agent ]
   - [ systemctl, start, qemu-guest-agent ]
 users:
-  - name: mihai
+  - name: $VM_USERNAME
     sudo: ALL=(ALL) NOPASSWD:ALL
     groups: users, admin
-    home: /home/mihai
+    home: /home/$VM_USERNAME
     shell: /bin/bash
     lock_passwd: false
-    passwd: $6$ARMwsturdwoxQu44$vD2GP4tbqBcpvVo6uDebWZjFudxsMLU5aYl8z/v/NTsD1vrIuaCLIiObLmBQww4ipqOjwcfIGD.U4J1oORSTH.
+    passwd: $VM_PASSWORD
 ssh_pwauth: true
 disable_root: false
 
@@ -183,9 +183,8 @@ USERDATA
     echo ""
     echo "VM Creation completed successfully!"
     echo "You can connect to the VM using:"
-    echo "  ssh mihai@$VM_IP"
-    echo "Password: mihai"
-}
+    echo "ssh $VM_USERNAME@$VM_IP"
+    echo "Password: [Using password from settings.conf]"}
 
 check_root
 create_vm

@@ -66,7 +66,7 @@ network:
         br0:
             interfaces:
                 - eth0
-            addresses: [$HOST_IP/22]
+            addresses: [$HOST_IP/$NETWORK_CIDR]
             mtu: 1500
             nameservers:
                 addresses:
