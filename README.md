@@ -15,27 +15,49 @@ kvm-on-ubuntu-for-morpheus/
 
 ## Prerequisites
 
-Before running the setup script, ensure you have:
+Before running the setup script, ensure you have updated the `settings.conf` file with your environment data:
 
-1. Updated the `settings.conf` file with your environment data:
+### Network Configuration
 
-   - HOST_IP
-   - HOST_MAC
-   - GATEWAY
-   - VM_IP
-2. If your network subnet differs from `/22`, modify the subnet configuration in:
+- HOST_IP
+- HOST_MAC
+- GATEWAY
+- DNS1
+- DNS2
+- NETWORK_CIDR
 
-   - `02-configure-network.sh`
-   - `03-create-vm.sh`
+### VM Configuration
+
+- VM_NAME
+- VM_IP
+- VM_RAM
+- VM_VCPUS
+- VM_SIZE
+- VM_USERNAME
+- VM_PASSWORD (hashed)
+
+### Storage Configuration
+
+- VM_DIR
 
 ## Considerations
 
-The newly created VM on the KVM host will have the following credentials:
+### Default Credentials
 
-- **username**: `mihai`
-- **password**: `Password123?`
+The VM credentials are configured in `settings.conf`. The default values are:
 
-You can update these credentials in the `04-create-vm.sh` file, in the cloud-init user-data section. The password hash can be generated with   `mkpasswd --method=SHA-512 --rounds=4096` command.
+- **Username**: `yourusername`
+- **Password**: `Password123?`
+
+### Password Configuration
+
+To update the VM password:
+
+1. Generate a new password hash:
+   ```bash
+   mkpasswd --method=SHA-512 --rounds=4096
+   ```
+2. Update the `VM_PASSWORD` variable in `settings.conf` with the generated hash
 
 ## Installation
 
