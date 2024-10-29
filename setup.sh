@@ -42,11 +42,14 @@ echo "==============="
 echo "This script will run all setup scripts in order."
 echo "Current settings:"
 echo " Host IP: $HOST_IP"
+echo " NETWORK CIDR: $NETWORK_CIDR"
 echo " Host MAC: $HOST_MAC"
 echo " VM IP: $VM_IP"
 echo " VM RAM: $VM_RAM MB"
 echo " VM CPUs: $VM_VCPUS"
 echo " VM Size: $VM_SIZE"
+echo " VM Username: $VM_USERNAME"
+echo " VM Password (hashed): $VM_PASSWORD"
 echo " Ubuntu Version: $UBUNTU_RELEASE"
 echo ""
 echo "Please verify these settings in config/settings.conf before continuing."
@@ -67,7 +70,7 @@ if ! ./scripts/01-install-kvm.sh; then
     exit 1
 fi
 
-echo "2. Configuring Storage Pools..."
+echo "2. Configuring the Environment..."
 if ! ./scripts/02-other-config-changes.sh; then
     echo "Storage pool configuration failed!"
     exit 1

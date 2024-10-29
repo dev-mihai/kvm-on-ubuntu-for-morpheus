@@ -61,7 +61,7 @@ To update the VM password:
 
 ## Installation
 
-1. Create the setup script:
+1. Create the setup script and copy the content from `setup.sh` file:
 
    ```bash
    nano setup.sh
@@ -76,5 +76,3 @@ To update the VM password:
    ```bash
    ./setup.sh
    ```
-
-This will execute the installation process and set up your KVM environment according to the specified configuration.

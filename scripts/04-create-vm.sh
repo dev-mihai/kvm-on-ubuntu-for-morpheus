@@ -16,53 +16,10 @@ verify_bridge() {
     fi
 }
 
-check_memory() {
-    local total_mem=$(free -m | awk '/^Mem:/{print $2}')
-    if [ $VM_RAM -gt $((total_mem/2)) ]; then
-        echo "WARNING: Requested VM memory ($VM_RAM MB) is more than half of system memory ($total_mem MB)"
-        read -p "Continue anyway? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
-    fi
-}
-
-setup_storage_pools() {
-    echo "=== Setting up storage pools ==="
-    
-    # Create directories if they don't exist
-    mkdir -p "$VM_DIR"
-    chmod 755 "$VM_DIR"
-    chown root:root "$VM_DIR"
-    
-    # Define default storage pool if it doesn't exist
-    if ! virsh pool-info default >/dev/null 2>&1; then
-        virsh pool-define-as --name default --type dir --target "$VM_DIR"
-        virsh pool-build default
-        virsh pool-start default
-        virsh pool-autostart default
-    fi
-    
-    # Verify pool is active
-    echo "=== Verifying storage pool ==="
-    virsh pool-list --all
-}
-
 create_vm() {
-    # Verify bridge exists
     verify_bridge
-    
-    # Check memory requirements
-    check_memory
-    
-    # Setup storage pools correctly
-    setup_storage_pools
-    
-    echo "=== Setting up environment variables ==="
     MAC_ADDR=$(printf '52:54:00:%02x:%02x:%02x' $((RANDOM%256)) $((RANDOM%256)) $((RANDOM%256)))
     INTERFACE=eth0
-    
     # Define paths
     CLOUD_IMAGE="$VM_DIR/focal-server-cloudimg-amd64.img"
     VM_DISK="$VM_DIR/$VM_NAME.qcow2"
@@ -85,7 +42,6 @@ create_vm() {
         echo "Failed to create VM disk"
         exit 1
     fi
-
     chown libvirt-qemu:libvirt-qemu "$VM_DISK"
     chmod 644 "$VM_DISK"
 
@@ -93,7 +49,7 @@ create_vm() {
     # Create cloud-init configs in a temporary directory
     TEMP_DIR=$(mktemp -d)
     cd "$TEMP_DIR" || exit 1
-    
+
     cat > network-config <<NETCONFIG
 network:
     version: 2
@@ -114,28 +70,27 @@ network:
             set-name: $INTERFACE
 NETCONFIG
 
-cat > user-data <<USERDATA
+    cat > user-data <<USERDATA
 #cloud-config
 hostname: $VM_NAME
 manage_etc_hosts: true
 # Install QEMU Guest Agent
 packages:
-  - qemu-guest-agent
+    - qemu-guest-agent
 # Enable and start QEMU Guest Agent
 runcmd:
-  - [ systemctl, enable, qemu-guest-agent ]
-  - [ systemctl, start, qemu-guest-agent ]
+    - [ systemctl, enable, qemu-guest-agent ]
+    - [ systemctl, start, qemu-guest-agent ]
 users:
-  - name: $VM_USERNAME
-    sudo: ALL=(ALL) NOPASSWD:ALL
-    groups: users, admin
-    home: /home/$VM_USERNAME
-    shell: /bin/bash
-    lock_passwd: false
-    passwd: $VM_PASSWORD
+    - name: $VM_USERNAME
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      groups: users, admin
+      home: /home/$VM_USERNAME
+      shell: /bin/bash
+      lock_passwd: false
+      passwd: $VM_PASSWORD
 ssh_pwauth: true
 disable_root: false
-
 USERDATA
 
     touch meta-data
@@ -157,17 +112,17 @@ USERDATA
 
     echo "=== Creating VM ==="
     virt-install --connect qemu:///system \
-      --virt-type kvm \
-      --name "$VM_NAME" \
-      --ram "$VM_RAM" \
-      --vcpus "$VM_VCPUS" \
-      --os-variant ubuntu20.04 \
-      --disk path="$VM_DISK",device=disk,format=qcow2 \
-      --disk path="$CLOUD_INIT_DISK",device=disk \
-      --import \
-      --network bridge=br0,model=virtio,mac="$MAC_ADDR" \
-      --channel unix,target_type=virtio,name=org.qemu.guest_agent.0 \
-      --noautoconsole
+        --virt-type kvm \
+        --name "$VM_NAME" \
+        --ram "$VM_RAM" \
+        --vcpus "$VM_VCPUS" \
+        --os-variant ubuntu20.04 \
+        --disk path="$VM_DISK",device=disk,format=qcow2 \
+        --disk path="$CLOUD_INIT_DISK",device=disk \
+        --import \
+        --network bridge=br0,model=virtio,mac="$MAC_ADDR" \
+        --channel unix,target_type=virtio,name=org.qemu.guest_agent.0 \
+        --noautoconsole
 
     if [ $? -ne 0 ]; then
         echo "Failed to create VM"
@@ -184,8 +139,8 @@ USERDATA
     echo "VM Creation completed successfully!"
     echo "You can connect to the VM using:"
     echo "ssh $VM_USERNAME@$VM_IP"
-    echo "Password: [Using password from settings.conf]"}
+    echo "Password: [Using password from settings.conf]"
+}
 
 check_root
 create_vm
-
