@@ -40,8 +40,6 @@ Before running the setup script, ensure you have updated the `settings.conf` fil
 
 - VM_DIR
 
-## Considerations
-
 ### Default Credentials
 
 The VM credentials are configured in `settings.conf`. The default values are:
